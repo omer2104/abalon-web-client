@@ -43,10 +43,10 @@ class AbalonBoard {
             const row = new Array(5 + mathFunction(rowIndex))
 
             for (let columnIndex = 0; columnIndex < row.length; columnIndex++) {
-                const initTile = initialValues.find(x => x.row === rowIndex && x.column === columnIndex)
+                const initTileState = initialValues.find(x => x.row === rowIndex && x.column === columnIndex)
 
-                if (initTile) {
-                    row[columnIndex] = initTile
+                if (initTileState) {
+                    row[columnIndex] = initTileState.tile
                 } else {
                     row[columnIndex] = new AbalonBoardTile(TileContent.Empty)
                 }
@@ -67,7 +67,7 @@ class AbalonBoard {
     }
 
     /**
-     * @returns {Array<{row: Number, column: Number, tile: AbalonBoardTile}>}
+     * @returns {Array<Array<{row: Number, column: Number, tile: AbalonBoardTile}>>}
      */
     getBoardState() {
         const boardState = []
@@ -75,13 +75,16 @@ class AbalonBoard {
         for (let i = 0; i < this.boardMat.length; i++) {
             const row = this.boardMat[i];
             
+            const rowState = []
             for (let j = 0; j < row.length; j++) {
                 const tile = row[j];
                 
-                boardState.push({
+                rowState.push({
                     row: i, column: j, tile
                 })
             }
+
+            boardState.push(rowState)
         }
 
         return boardState
