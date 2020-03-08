@@ -1,12 +1,12 @@
 import React, { useContext, useMemo } from 'react'
 import PropTypes from 'prop-types'
 import { blackBallURL, backBoardURL, whiteBallURL, emptyMarkedURL, blackBallYellowURL,
-            whiteBallYellowURL } from "../../assets";
+            whiteBallYellowURL, whiteBallMarkedURL, blackBallMarkedURL } from "../../assets";
 import { Stage, Layer, Image } from 'react-konva'
 import useImage from "use-image";
 import { AbalonGame, AbalonBoardTile, TileContent } from '../../modules/abalon-game';
 import { AbalonGameContext } from '../AbalonGamePage/AbalonGamePage';
-import { gameFirstSelection } from '../../reducers/abalonGame/abalonGameActions';
+import { gameFirstSelection, gameResetSelection } from '../../reducers/abalonGame/abalonGameActions';
 
 const TILE_SIZE = 25
 const PADDING_SIZE_X = 10
@@ -21,8 +21,23 @@ const mathFunction = (num) => {
     return 0
 }
 
+const mathFunction2 = (num) => {
+    switch (num) {
+        case 0: return 0
+        case 1: return 2
+        case 2: return 8
+        case 3: return 11
+        case 4: return 18
+        case 5: return 11
+        case 6: return 8
+        case 7: return 2
+        case 8: return 0
+        default: return 0
+    }
+}
+
 const tilePositionToCoordinates = (row, column) => {
-    const rowOffset = (4 - mathFunction(row)) * 25 / 2
+    const rowOffset = (4 - mathFunction(row)) * 25 / 2 - mathFunction2(row)
 
     return {
         x: rowOffset + TILE_SIZE * column + PADDING_SIZE_X * column + 65,
@@ -39,6 +54,8 @@ const BoardGame = props => {
     const [whiteBallYellowImage] = useImage(whiteBallYellowURL)
     const [backBoardImage] = useImage(backBoardURL)
     const [emptyMarkedImage] = useImage(emptyMarkedURL)
+    const [whiteBallMarkedImage] = useImage(whiteBallMarkedURL)
+    const [blackBallMarkedImage] = useImage(blackBallMarkedURL)
     
     const { selectedTileState } = abalonGameState
     /**@type {AbalonGame} */
@@ -58,6 +75,12 @@ const BoardGame = props => {
                 return blackBallYellowImage
             case TileContent.WhiteSoldierMarkedSelection:
                 return whiteBallYellowImage
+            case TileContent.EmptyMarkedAction:
+                return emptyMarkedImage
+            case TileContent.WhiteSoldierMarkedAction:
+                return whiteBallMarkedImage
+            case TileContent.BlackSoldierMarkedAction:
+                return blackBallMarkedImage
             case TileContent.Empty:
                 return ''
             default:
@@ -73,11 +96,16 @@ const BoardGame = props => {
         const { row, column, tile } = tileState
         
         if (selectedTileState === null) { // If first select
-            // [TODO] fetch from server possible moves
+            // [TODO] fetch from server possible moves and add it to the action and state
 
             abalonGameDispatch(gameFirstSelection(tileState))
         } else { // If second select
+            // [TODO] check with state if the move is valid (compare the destination with possible moves in state)
 
+            // If it is, execute move with server and dispatch the new board 
+
+            // Otherwise, reset the selection
+            abalonGameDispatch(gameResetSelection())
         }
     }
 

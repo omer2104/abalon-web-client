@@ -53,6 +53,51 @@ class AbalonGame {
                 return false
         }
     }
+
+    /**
+     * 
+     * @param {Number} row 
+     * @param {Number} column 
+     * @returns {Boolean} true if tile could be marked, otherwise false
+     */
+    unmarkTileSelected(row, column) {
+        const { content } = this.board.getTile(row, column)
+        
+        switch (content) {
+            case TileContent.BlackSoldierMarkedSelection:
+                this.board.setTile(row, column, TileContent.BlackSoldier)
+                return true
+            case TileContent.WhiteSoldierMarkedSelection:
+                this.board.setTile(row, column, TileContent.WhiteSoldier)
+                return true
+            default:
+                return false
+        }
+    }
+
+    /**
+     * 
+     * @param {Number} row 
+     * @param {Number} column 
+     * @returns {Boolean} true if tile could be marked, otherwise false
+     */
+    unmarkTileAction(row, column) {
+        const { content } = this.board.getTile(row, column)
+        
+        switch (content) {
+            case TileContent.BlackSoldierMarkedAction:
+                this.board.setTile(row, column, TileContent.BlackSoldier)
+                return true
+            case TileContent.WhiteSoldierMarkedAction:
+                this.board.setTile(row, column, TileContent.WhiteSoldier)
+                return true
+            case TileContent.EmptyMarkedAction:
+                this.board.setTile(row, column, TileContent.Empty)
+                return true
+            default:
+                return false
+        }
+    }
 }
 
 export {

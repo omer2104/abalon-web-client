@@ -15,7 +15,9 @@ const AbalonGamePage = props => {
         <AbalonGameContext.Provider value={{ abalonGameState, abalonGameDispatch }}>
             <div>
                 <h1>Game Is In Session</h1>
-                <BoardGame />
+                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                    <BoardGame />
+                </div>
             </div>
         </AbalonGameContext.Provider>
     )
