@@ -67,6 +67,16 @@ class AbalonBoard {
     }
 
     /**
+     * 
+     * @param {Number} row 
+     * @param {Number} column 
+     * @param {String} content 
+     */
+    setTile(row, column, content) {
+        this.boardMat[row][column] = new AbalonBoardTile(content)
+    }
+
+    /**
      * @returns {Array<Array<{row: Number, column: Number, tile: AbalonBoardTile}>>}
      */
     getBoardState() {

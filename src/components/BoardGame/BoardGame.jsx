@@ -1,10 +1,12 @@
 import React, { useContext, useMemo } from 'react'
 import PropTypes from 'prop-types'
-import { blackBallURL, backBoardURL, whiteBallURL, emptyMarkedURL } from "../../assets";
+import { blackBallURL, backBoardURL, whiteBallURL, emptyMarkedURL, blackBallYellowURL,
+            whiteBallYellowURL } from "../../assets";
 import { Stage, Layer, Image } from 'react-konva'
 import useImage from "use-image";
-import { AbalonBoard, AbalonBoardTile, TileContent } from '../../modules/abalon-game';
+import { AbalonGame, AbalonBoardTile, TileContent } from '../../modules/abalon-game';
 import { AbalonGameContext } from '../AbalonGamePage/AbalonGamePage';
+import { gameFirstSelection } from '../../reducers/abalonGame/abalonGameActions';
 
 const TILE_SIZE = 25
 const PADDING_SIZE_X = 10
@@ -33,10 +35,14 @@ const BoardGame = props => {
 
     const [blackBallImage] = useImage(blackBallURL)
     const [whiteBallImage] = useImage(whiteBallURL)
+    const [blackBallYellowImage] = useImage(blackBallYellowURL)
+    const [whiteBallYellowImage] = useImage(whiteBallYellowURL)
     const [backBoardImage] = useImage(backBoardURL)
     const [emptyMarkedImage] = useImage(emptyMarkedURL)
     
-    const { abalonGame } = abalonGameState
+    const { selectedTileState } = abalonGameState
+    /**@type {AbalonGame} */
+    const abalonGame = abalonGameState.abalonGame
     const boardState = abalonGame.board.getBoardState()
     
     /**
@@ -48,10 +54,30 @@ const BoardGame = props => {
                 return whiteBallImage
             case TileContent.BlackSoldier:
                 return blackBallImage
+            case TileContent.BlackSoldierMarkedSelection:
+                return blackBallYellowImage
+            case TileContent.WhiteSoldierMarkedSelection:
+                return whiteBallYellowImage
             case TileContent.Empty:
                 return ''
             default:
                 return ''
+        }
+    }
+
+    /**
+     * @param {import('konva/types/Node').KonvaEventObject<MouseEvent>} e 
+     * @param {{row: Number, column: Number, tile: AbalonBoardTile}} tileState
+     * */
+    const handleTileClick = (e, tileState) => {
+        const { row, column, tile } = tileState
+        
+        if (selectedTileState === null) { // If first select
+            // [TODO] fetch from server possible moves
+
+            abalonGameDispatch(gameFirstSelection(tileState))
+        } else { // If second select
+
         }
     }
 
@@ -70,8 +96,14 @@ const BoardGame = props => {
                                 height={TILE_SIZE}
                                 x={x}
                                 y={y}
-                                onClick={(e) => {
-                                    console.log(e)
+                                onClick={(e) => handleTileClick(e, tileState)}
+                                onMouseEnter={(e) => {
+                                    if (tileState.tile.content !== TileContent.Empty) {
+                                        document.body.style.cursor = 'pointer'
+                                    }
+                                }}
+                                onMouseLeave={(e) => {
+                                    document.body.style.cursor = 'default'
                                 }}
                             />
                         )

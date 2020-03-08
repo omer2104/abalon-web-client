@@ -9,6 +9,8 @@ class AbalonBoardTile {
     constructor(content) {
         this.content = content
     }
+
+    
 }
 
 
