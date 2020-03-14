@@ -6,6 +6,8 @@ import whiteBallURL from "./white-ball.png"
 import whiteBallMarkedURL from "./white-marked.png"
 import whiteBallYellowURL from "./white-ball-light-yellow.png"
 import backBoardURL from "./back-board.jpg"
+import instructionsURL from "./instructions.png";
+import instructions2URL from "./instructions2.png";
 
 export {
     emptyMarkedURL,
@@ -15,5 +17,7 @@ export {
     whiteBallURL,
     whiteBallMarkedURL,
     whiteBallYellowURL,
-    backBoardURL
+    backBoardURL,
+    instructionsURL,
+    instructions2URL
 }
