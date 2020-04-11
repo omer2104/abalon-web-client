@@ -76,9 +76,18 @@ const StartPage = props => {
                                 document.getElementById("gotoGameBtn").click()
                             }}
                         >
-                            Let's Play
+                            Play Against Each Other
                         </Button>
                         <Link id="gotoGameBtn" to={AppRoutes.abalonGamePage} />
+                        <Button
+                            className={classes.boxButton}
+                            onClick={e => {
+                                document.getElementById("gotoGameBtn2").click()
+                            }}
+                        >
+                            Test Our AI
+                        </Button>
+                        <Link id="gotoGameBtn2" to={AppRoutes.abalonGamePageWithAI} />
                         <Button
                             className={classes.boxButton}
                             onClick={e => {
@@ -86,16 +95,6 @@ const StartPage = props => {
                             }}
                         >
                             Game Rules
-                        </Button>
-                        <Button
-                            className={classes.boxButton}
-                            onClick={e => {
-                                connectionTest().then(data => {
-                                    console.log(data)
-                                })
-                            }}
-                        >
-                            Conn Test
                         </Button>
                     </Box>
                 </Box>

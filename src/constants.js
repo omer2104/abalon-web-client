@@ -1,6 +1,7 @@
 export const AppRoutes = {
     startPage: '/',
-    abalonGamePage: '/game'
+    abalonGamePage: '/game',
+    abalonGamePageWithAI: '/game-ai'
 }
 
 

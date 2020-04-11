@@ -1,4 +1,4 @@
-import { GAME_FIRST_SELECTION, GAME_SECOND_SELECTION, GAME_RESET_SELECTION, GAME_COMMIT_MOVE } from "./abalonGameTypes"
+import { GAME_FIRST_SELECTION, GAME_SECOND_SELECTION, GAME_RESET_SELECTION, GAME_COMMIT_MOVE, GAME_AI_COMMIT_MOVE } from "./abalonGameTypes"
 
 
 export const gameFirstSelection = (tileState, nextMovesPositions) => {
@@ -8,9 +8,16 @@ export const gameFirstSelection = (tileState, nextMovesPositions) => {
     }
 }
 
-export const gameCommitMove = (newAbalonBoard) => {
+export const gameCommitMove = (newAbalonBoard, againstAI) => {
     return {
         type: GAME_COMMIT_MOVE,
+        payload: { newAbalonBoard, againstAI }
+    }
+}
+
+export const gameAICommitMove = (newAbalonBoard) => {
+    return {
+        type: GAME_AI_COMMIT_MOVE,
         payload: newAbalonBoard
     }
 }

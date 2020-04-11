@@ -1,5 +1,5 @@
 import { AbalonGame } from "../../modules/abalon-game"
-import { GAME_FIRST_SELECTION, GAME_SECOND_SELECTION, GAME_RESET_SELECTION, GAME_COMMIT_MOVE } from "./abalonGameTypes"
+import { GAME_FIRST_SELECTION, GAME_SECOND_SELECTION, GAME_RESET_SELECTION, GAME_COMMIT_MOVE, GAME_AI_COMMIT_MOVE } from "./abalonGameTypes"
 import { objectShallowClone } from "../../constants"
 
 
@@ -9,6 +9,7 @@ const abalonGameInit = (initialBoardState) => {
         abalonGame: new AbalonGame(initialBoardState),
         selectedTileState: null,
         nextMovesPositions: [],
+        isAITurn: false,
     }
 }
 
@@ -36,7 +37,7 @@ const abalonGameReducer = (state, action) => {
             }
         }  
         case GAME_COMMIT_MOVE: {
-            const newAbalonBoard = action.payload
+            const { newAbalonBoard, againstAI } = action.payload
             const { row, column } = state.selectedTileState
 
             /**@type {AbalonGame} */
@@ -55,12 +56,31 @@ const abalonGameReducer = (state, action) => {
 
             // Toggle Turn
             abalonGameCopy.switchTurn()
-            
+
             return {
                 ...state,
                 abalonGame: abalonGameCopy,
                 selectedTileState: null,
                 nextMovesPositions: [],
+                isAITurn: againstAI,
+            }
+        }
+        case GAME_AI_COMMIT_MOVE: {
+            const newAbalonBoard = action.payload
+
+            /**@type {AbalonGame} */
+            const abalonGameCopy = objectShallowClone(state.abalonGame, AbalonGame.prototype)
+
+            // Reload the board to the next board state
+            abalonGameCopy.board = newAbalonBoard
+
+            // Toggle Turn
+            abalonGameCopy.switchTurn()
+
+            return {
+                ...state,
+                abalonGame: abalonGameCopy,
+                isAITurn: false,
             }
         }
         case GAME_SECOND_SELECTION: {

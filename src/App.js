@@ -11,7 +11,8 @@ function App() {
       <Router>
         <Switch>
           <Route exact path={AppRoutes.startPage} render={(props) => <StartPage {...props} />} />
-          <Route exact path={AppRoutes.abalonGamePage} render={(props) => <AbalonGamePage {...props} />} />
+          <Route exact path={AppRoutes.abalonGamePage} render={(props) => <AbalonGamePage {...props} againstAI={false} />} />
+          <Route exact path={AppRoutes.abalonGamePageWithAI} render={(props) => <AbalonGamePage {...props} againstAI={true} />} />
         </Switch>
       </Router>
     </SnackbarProvider>

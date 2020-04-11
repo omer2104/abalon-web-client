@@ -1,4 +1,4 @@
-import React, { useContext, useMemo } from 'react'
+import React, { useContext, useMemo, useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import { blackBallURL, backBoardURL, whiteBallURL, emptyMarkedURL, blackBallYellowURL,
             whiteBallYellowURL, whiteBallMarkedURL, blackBallMarkedURL } from "../../assets";
@@ -6,9 +6,10 @@ import { Stage, Layer, Image } from 'react-konva'
 import useImage from "use-image";
 import { AbalonGame, AbalonBoardTile, TileContent, Players } from '../../modules/abalon-game';
 import { AbalonGameContext } from '../AbalonGamePage/AbalonGamePage';
-import { gameFirstSelection, gameResetSelection, gameCommitMove } from '../../reducers/abalonGame/abalonGameActions';
-import { getPossibleNextMoves, commitMove } from '../../abalon-api';
+import { gameFirstSelection, gameResetSelection, gameCommitMove, gameAICommitMove } from '../../reducers/abalonGame/abalonGameActions';
+import { getPossibleNextMoves, commitMove, checkWinner, getMoveFromAI } from '../../abalon-api';
 import { useSnackbar } from 'notistack';
+import { CircularProgress, Typography, Box } from '@material-ui/core';
 
 const TILE_SIZE = 25
 const PADDING_SIZE_X = 10
@@ -48,7 +49,7 @@ const tilePositionToCoordinates = (row, column) => {
 }
 
 const BoardGame = props => {
-    const { againstAI = false } = props
+    const { againstAI } = props
     const { abalonGameState, abalonGameDispatch } = useContext(AbalonGameContext)
 
     const [blackBallImage] = useImage(blackBallURL)
@@ -61,6 +62,8 @@ const BoardGame = props => {
     const [blackBallMarkedImage] = useImage(blackBallMarkedURL)
     
     const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+
+    const [winnerAlreadyAnnounced, setWinnerAlreadyAnnounced] = useState(false)
 
     const { selectedTileState } = abalonGameState
     /**@type {AbalonGame} */
@@ -126,7 +129,7 @@ const BoardGame = props => {
 
                 commitMove(abalonGame.turn, sourcePosition, { row, column }, abalonGame.board)
                     .then(newAbalonBoard => {
-                        abalonGameDispatch(gameCommitMove(newAbalonBoard))
+                        abalonGameDispatch(gameCommitMove(newAbalonBoard, againstAI))
                     })
                     .catch(err => {
                         enqueueSnackbar("There has been an error reaching the server", {
@@ -139,36 +142,75 @@ const BoardGame = props => {
         }
     }
 
+    useEffect(() => {
+        if (!winnerAlreadyAnnounced) {
+            checkWinner(abalonGame.board)
+                .then(player => {
+                    if ([Players.White, Players.Black].includes(player)) {
+                        enqueueSnackbar(`Player ${player} wins! You may continue playing if you want :-)`, {
+                            variant: "success",
+                        })
+                        setWinnerAlreadyAnnounced(true)
+                    }
+                })
+        }
+    }, [abalonGame.turn, winnerAlreadyAnnounced])
+
+    useEffect(() => {
+        if (abalonGameState.isAITurn) {
+            getMoveFromAI(abalonGame.turn, abalonGame.board, 60 * 1000)
+                .then(newAbalonBoard => {
+                    abalonGameDispatch(gameAICommitMove(newAbalonBoard))
+                })
+        }
+    }, [abalonGameState.isAITurn])
+
     return (
-        <Stage width={500} height={500}>
-            <Layer>
-                <Image image={backBoardImage}  />
-                {boardState.map(rowState => (
-                    rowState.map((tileState) => {
-                        const { x, y } = tilePositionToCoordinates(tileState.row, tileState.column) 
-                        return (
-                            <Image 
-                                key={`${tileState.row} ${tileState.column}`}
-                                image={tileToImage(tileState.tile)}
-                                width={TILE_SIZE}
-                                height={TILE_SIZE}
-                                x={x}
-                                y={y}
-                                onClick={(e) => handleTileClick(e, tileState)}
-                                onMouseEnter={(e) => {
-                                    if (tileState.tile.content !== TileContent.Empty) {
-                                        document.body.style.cursor = 'pointer'
-                                    }
-                                }}
-                                onMouseLeave={(e) => {
-                                    document.body.style.cursor = 'default'
-                                }}
-                            />
-                        )
-                    })
-                ))}
-            </Layer>
-        </Stage>
+        <div>
+            <Stage width={400} height={400}>
+                <Layer>
+                    <Image image={backBoardImage}  />
+                    {boardState.map(rowState => (
+                        rowState.map((tileState) => {
+                            const { x, y } = tilePositionToCoordinates(tileState.row, tileState.column) 
+                            return (
+                                <Image 
+                                    key={`${tileState.row} ${tileState.column}`}
+                                    image={tileToImage(tileState.tile)}
+                                    width={TILE_SIZE}
+                                    height={TILE_SIZE}
+                                    x={x}
+                                    y={y}
+                                    onClick={(e) => {
+                                        if (!abalonGameState.isAITurn) {
+                                            handleTileClick(e, tileState)
+                                        }
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        if (tileState.tile.content !== TileContent.Empty) {
+                                            document.body.style.cursor = 'pointer'
+                                        }
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        document.body.style.cursor = 'default'
+                                    }}
+                                />
+                            )
+                        })
+                    ))}
+                </Layer>
+            </Stage>
+            {
+                abalonGameState.isAITurn && (
+                    <Box display="flex" flexDirection="row" justifyContent="center">
+                        <Typography variant="h4" style={{ marginRight: 5 }}>
+                            AI is thinking
+                        </Typography>
+                        <CircularProgress color="secondary" />
+                    </Box>
+                )
+            }
+        </div>
     )
 }
 

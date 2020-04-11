@@ -29,6 +29,17 @@ const turnConverter = (turn) => {
     }
 }
 /**
+ *  
+ * @param {String} turn 
+ */
+const turnConverterToEnum = (player) => {
+    switch (player) {
+        case "BLACK": return Players.Black
+        case "WHITE": return Players.White
+        default: return ""
+    }
+}
+/**
  * 
  * @param {AbalonBoard} boardState 
  */
@@ -153,12 +164,65 @@ const commitMove = (turn, sourcePosition, destPosition, boardState, msTimeout = 
     }))
 }
 
-const getNextMove = () => {
+/**
+ * 
+ * @param {AbalonBoard} boardState 
+ * @param {Number} msTimeout 
+ */
+const checkWinner = (boardState, msTimeout = 10 * 1000) => {
+    const data = {
+        boardState: boardStateConverter(boardState)
+    }
 
+    return promiseTimeout(msTimeout, new Promise((resolve, reject) => {
+        fetch("/api/winner", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+            .then(resp => resp.text())
+            .then(data => turnConverterToEnum(data))
+            .then(data => resolve(data))
+            .catch(err => reject(err))
+    }))
+}
+
+/**
+ * 
+ * @param {String} turn 
+ * @param {AbalonBoard} boardState 
+ * @param {Number} msTimeout 
+ * @returns {Promise<AbalonBoard>}
+ */
+const getMoveFromAI = (turn, boardState, msTimeout = 10 * 1000) => {
+    const data = {
+        currentTurn: turnConverter(turn),
+        boardState: boardStateConverter(boardState)
+    }
+
+    return promiseTimeout(msTimeout, new Promise((resolve, reject) => {
+        fetch("/api/ai", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+            .then(resp => resp.json())
+            .then(data => {
+                return boardStateConverterToObj(data);
+            })
+            .then(data => resolve(data))
+            .catch(err => reject(err))
+    }))
 }
 
 export {
     connectionTest,
     getPossibleNextMoves,
     commitMove,
+    checkWinner,
+    getMoveFromAI,
 }

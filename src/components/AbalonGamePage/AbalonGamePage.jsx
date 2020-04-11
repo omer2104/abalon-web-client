@@ -45,7 +45,7 @@ const useStyles = makeStyles(theme => ({
 }))
 
 const AbalonGamePage = props => {
-    const { initialBoardState = initialTiles } = props
+    const { initialBoardState = initialTiles, againstAI = false } = props
     const [abalonGameState, abalonGameDispatch] = useReducer(abalonGameReducer, initialBoardState, abalonGameInit)
 
     /**@type {AbalonGame} */
@@ -67,7 +67,7 @@ const AbalonGamePage = props => {
                 </div>
                 <Divider style={{ marginBottom: 20 }} />
                 <div style={{ display: 'flex', justifyContent: 'center' }}>
-                    <BoardGame />
+                    <BoardGame againstAI={againstAI} />
                 </div>
             </div>
         </AbalonGameContext.Provider>
