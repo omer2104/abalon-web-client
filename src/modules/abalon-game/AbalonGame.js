@@ -9,6 +9,14 @@ class AbalonGame {
         this.turn = turn
     }
 
+    switchTurn() {
+        if (this.turn === Players.Black) {
+            this.turn = Players.White
+        } else if (this.turn === Players.White) {
+            this.turn = Players.Black
+        }
+    }
+
     /**
      * 
      * @param {Number} row 

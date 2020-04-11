@@ -13,7 +13,7 @@ logic representation:
 7      [1, 2, 3, 4, 5, 6, 7]
 8        [1, 2, 3, 4, 5, 6]
 9         [1, 2, 3, 4, 5]
-
+[NOTICE]
 inside the matrix, all the numbers above will be decremented (because arrays start at index 0)
 */
 

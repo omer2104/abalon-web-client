@@ -4,6 +4,7 @@ import { Box, makeStyles, Typography, Divider, Button, Dialog, DialogTitle } fro
 import { Link } from 'react-router-dom';
 import { AppRoutes } from '../../constants';
 import { instructionsURL, instructions2URL } from '../../assets';
+import { connectionTest } from '../../abalon-api';
 
 const useStyles = makeStyles(theme => ({
     boxTitle: {
@@ -85,6 +86,16 @@ const StartPage = props => {
                             }}
                         >
                             Game Rules
+                        </Button>
+                        <Button
+                            className={classes.boxButton}
+                            onClick={e => {
+                                connectionTest().then(data => {
+                                    console.log(data)
+                                })
+                            }}
+                        >
+                            Conn Test
                         </Button>
                     </Box>
                 </Box>

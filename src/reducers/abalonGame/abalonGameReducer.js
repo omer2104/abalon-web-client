@@ -1,35 +1,68 @@
 import { AbalonGame } from "../../modules/abalon-game"
-import { GAME_FIRST_SELECTION, GAME_SECOND_SELECTION, GAME_RESET_SELECTION } from "./abalonGameTypes"
+import { GAME_FIRST_SELECTION, GAME_SECOND_SELECTION, GAME_RESET_SELECTION, GAME_COMMIT_MOVE } from "./abalonGameTypes"
 import { objectShallowClone } from "../../constants"
 
 
 
 const abalonGameInit = (initialBoardState) => {
-
     return {
         abalonGame: new AbalonGame(initialBoardState),
-        selectedTileState: null
+        selectedTileState: null,
+        nextMovesPositions: [],
     }
 }
 
 const abalonGameReducer = (state, action) => {
     switch (action.type) {
         case GAME_FIRST_SELECTION: {
-            const tileState = action.payload
+            const { tileState, nextMovesPositions } = action.payload
             const { row, column, tile } = tileState
             /**@type {AbalonGame} */
             const abalonGameCopy = objectShallowClone(state.abalonGame, AbalonGame.prototype)
             
             abalonGameCopy.markTileSelected(row, column)
 
-            // [TODO] add mark action to the possible moves when they will be provided
+            // Mark action to the possible moves 
+            for (const position of nextMovesPositions) {
+                const { row, column } = position
+                abalonGameCopy.markTileAction(row, column)
+            }
 
             return {
                 ...state,
                 abalonGame: abalonGameCopy,
                 selectedTileState: tileState,
+                nextMovesPositions,
             }
         }  
+        case GAME_COMMIT_MOVE: {
+            const newAbalonBoard = action.payload
+            const { row, column } = state.selectedTileState
+
+            /**@type {AbalonGame} */
+            const abalonGameCopy = objectShallowClone(state.abalonGame, AbalonGame.prototype)
+
+            // Reset GUI
+            abalonGameCopy.unmarkTileSelected(row, column)
+
+            for (const position of state.nextMovesPositions) {
+                const { row, column } = position
+                abalonGameCopy.unmarkTileAction(row, column)
+            }
+
+            // Reload the board to the next board state
+            abalonGameCopy.board = newAbalonBoard
+
+            // Toggle Turn
+            abalonGameCopy.switchTurn()
+            
+            return {
+                ...state,
+                abalonGame: abalonGameCopy,
+                selectedTileState: null,
+                nextMovesPositions: [],
+            }
+        }
         case GAME_SECOND_SELECTION: {
             const tileState = action.payload
             const { row, column, tile } = tileState
@@ -50,12 +83,17 @@ const abalonGameReducer = (state, action) => {
 
             abalonGameCopy.unmarkTileSelected(row, column)
 
-            // [TODO] add unmark action of all the action marked tiles
+            // Unmark action of all the action marked tiles
+            for (const position of state.nextMovesPositions) {
+                const { row, column } = position
+                abalonGameCopy.unmarkTileAction(row, column)
+            }
 
             return {
                 ...state,
                 abalonGame: abalonGameCopy,
-                selectedTileState: null
+                selectedTileState: null,
+                nextMovesPositions: [],
             }
         }
         default:

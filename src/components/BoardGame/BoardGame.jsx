@@ -4,9 +4,11 @@ import { blackBallURL, backBoardURL, whiteBallURL, emptyMarkedURL, blackBallYell
             whiteBallYellowURL, whiteBallMarkedURL, blackBallMarkedURL } from "../../assets";
 import { Stage, Layer, Image } from 'react-konva'
 import useImage from "use-image";
-import { AbalonGame, AbalonBoardTile, TileContent } from '../../modules/abalon-game';
+import { AbalonGame, AbalonBoardTile, TileContent, Players } from '../../modules/abalon-game';
 import { AbalonGameContext } from '../AbalonGamePage/AbalonGamePage';
-import { gameFirstSelection, gameResetSelection } from '../../reducers/abalonGame/abalonGameActions';
+import { gameFirstSelection, gameResetSelection, gameCommitMove } from '../../reducers/abalonGame/abalonGameActions';
+import { getPossibleNextMoves, commitMove } from '../../abalon-api';
+import { useSnackbar } from 'notistack';
 
 const TILE_SIZE = 25
 const PADDING_SIZE_X = 10
@@ -46,6 +48,7 @@ const tilePositionToCoordinates = (row, column) => {
 }
 
 const BoardGame = props => {
+    const { againstAI = false } = props
     const { abalonGameState, abalonGameDispatch } = useContext(AbalonGameContext)
 
     const [blackBallImage] = useImage(blackBallURL)
@@ -57,6 +60,8 @@ const BoardGame = props => {
     const [whiteBallMarkedImage] = useImage(whiteBallMarkedURL)
     const [blackBallMarkedImage] = useImage(blackBallMarkedURL)
     
+    const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+
     const { selectedTileState } = abalonGameState
     /**@type {AbalonGame} */
     const abalonGame = abalonGameState.abalonGame
@@ -96,16 +101,41 @@ const BoardGame = props => {
         const { row, column, tile } = tileState
         
         if (selectedTileState === null) { // If first select
-            // [TODO] fetch from server possible moves and add it to the action and state
+            if ((tile.isBlackSoldier() && abalonGame.turn === Players.White) ||
+                (tile.isWhiteSoldier() && abalonGame.turn === Players.Black)) {
+                enqueueSnackbar("Mind the current turn!")
+            }
 
-            abalonGameDispatch(gameFirstSelection(tileState))
+            // Fetch from server possible moves and add it to the action and state
+            getPossibleNextMoves(abalonGame.turn, { row, column }, abalonGame.board)
+                .then(nextMovesPositions => {
+                    abalonGameDispatch(gameFirstSelection(tileState, nextMovesPositions))
+                }).catch(err => {
+                    enqueueSnackbar("There has been an error reaching the server", {
+                        variant: "error",
+                    })
+                })
         } else { // If second select
-            // [TODO] check with state if the move is valid (compare the destination with possible moves in state)
+            // Check with state if the move is valid (compare the destination with possible moves in state)
+            if (abalonGameState.nextMovesPositions.find(pos => pos.row === row && pos.column === column)) {
+                // If it is, execute move with server and dispatch the new board 
+                const sourcePosition = {
+                    row: abalonGameState.selectedTileState.row,
+                    column: abalonGameState.selectedTileState.column
+                }
 
-            // If it is, execute move with server and dispatch the new board 
-
-            // Otherwise, reset the selection
-            abalonGameDispatch(gameResetSelection())
+                commitMove(abalonGame.turn, sourcePosition, { row, column }, abalonGame.board)
+                    .then(newAbalonBoard => {
+                        abalonGameDispatch(gameCommitMove(newAbalonBoard))
+                    })
+                    .catch(err => {
+                        enqueueSnackbar("There has been an error reaching the server", {
+                            variant: "error",
+                        })
+                    })
+            } else {
+                abalonGameDispatch(gameResetSelection())
+            }
         }
     }
 

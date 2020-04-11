@@ -10,7 +10,25 @@ class AbalonBoardTile {
         this.content = content
     }
 
-    
+    isBlackSoldier() {
+        return (
+            [
+                TileContent.BlackSoldier,
+                TileContent.BlackSoldierMarkedAction,
+                TileContent.BlackSoldierMarkedSelection,
+            ].includes(this.content)
+        )
+    }
+
+    isWhiteSoldier() {
+        return (
+            [
+                TileContent.WhiteSoldier,
+                TileContent.WhiteSoldierMarkedAction,
+                TileContent.WhiteSoldierMarkedSelection,
+            ].includes(this.content)
+        )
+    }
 }
 
 
