@@ -117,7 +117,7 @@ const getPossibleNextMoves = (turn, position, boardState, msTimeout = 10 * 1000)
     }
 
     return promiseTimeout(msTimeout, new Promise((resolve, reject) => {
-        fetch("/api/possibleMoves", {
+        fetch("/api/abalongame/moves/all", {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -148,7 +148,7 @@ const commitMove = (turn, sourcePosition, destPosition, boardState, msTimeout = 
     }
 
     return promiseTimeout(msTimeout, new Promise((resolve, reject) => {
-        fetch("/api/nextPlayerMove", {
+        fetch("/api/abalongame/moves/execute", {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -175,7 +175,7 @@ const checkWinner = (boardState, msTimeout = 10 * 1000) => {
     }
 
     return promiseTimeout(msTimeout, new Promise((resolve, reject) => {
-        fetch("/api/winner", {
+        fetch("/api/abalongame/rules/winner", {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -203,7 +203,7 @@ const getMoveFromAI = (turn, boardState, msTimeout = 10 * 1000) => {
     }
 
     return promiseTimeout(msTimeout, new Promise((resolve, reject) => {
-        fetch("/api/ai", {
+        fetch("/api/abalongame/moves/ai", {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

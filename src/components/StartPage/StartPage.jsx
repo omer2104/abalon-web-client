@@ -1,10 +1,8 @@
 import React, { useState } from 'react'
-import PropTypes from 'prop-types'
-import { Box, makeStyles, Typography, Divider, Button, Dialog, DialogTitle } from "@material-ui/core";
+import { Box, makeStyles, Typography, Divider, Button, Dialog } from "@material-ui/core";
 import { Link } from 'react-router-dom';
 import { AppRoutes } from '../../constants';
 import { instructionsURL, instructions2URL } from '../../assets';
-import { connectionTest } from '../../abalon-api';
 
 const useStyles = makeStyles(theme => ({
     boxTitle: {
