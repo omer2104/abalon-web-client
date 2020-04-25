@@ -143,7 +143,7 @@ const BoardGame = props => {
 
     useEffect(() => {
         if (!winnerAlreadyAnnounced) {
-            checkWinner(abalonGame.board)
+            checkWinner(abalonGame.board, againstAI)
                 .then(player => {
                     if ([Players.White, Players.Black].includes(player)) {
                         enqueueSnackbar(`Player ${player} wins! You may continue playing if you want :-)`, {
@@ -153,7 +153,7 @@ const BoardGame = props => {
                     }
                 })
         }
-    }, [abalonGame.turn, winnerAlreadyAnnounced])
+    }, [abalonGame.turn, againstAI, winnerAlreadyAnnounced])
 
     useEffect(() => {
         if (abalonGameState.isAITurn) {

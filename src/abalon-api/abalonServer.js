@@ -167,11 +167,13 @@ const commitMove = (turn, sourcePosition, destPosition, boardState, msTimeout = 
 /**
  * 
  * @param {AbalonBoard} boardState 
+ * @param {Boolean} againstAI
  * @param {Number} msTimeout 
  */
-const checkWinner = (boardState, msTimeout = 10 * 1000) => {
+const checkWinner = (boardState, againstAI, msTimeout = 10 * 1000) => {
     const data = {
-        boardState: boardStateConverter(boardState)
+        boardState: boardStateConverter(boardState),
+        againstAI
     }
 
     return promiseTimeout(msTimeout, new Promise((resolve, reject) => {
