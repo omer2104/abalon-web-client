@@ -1,8 +1,7 @@
 import React, { useReducer } from 'react'
-import PropTypes from 'prop-types'
 import BoardGame from '../BoardGame/BoardGame'
 import { abalonGameReducer, abalonGameInit } from '../../reducers/abalonGame/abalonGameReducer'
-import { AbalonBoardTile, TileContent, AbalonGame, Players } from '../../modules/abalon-game'
+import { AbalonGame, Players } from '../../modules/abalon-game'
 import { initialTiles } from './initialBoardState'
 import { makeStyles, Typography, Divider } from '@material-ui/core'
 

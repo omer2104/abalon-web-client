@@ -1,5 +1,4 @@
-import React, { useContext, useMemo, useEffect, useState } from 'react'
-import PropTypes from 'prop-types'
+import React, { useContext, useEffect, useState } from 'react'
 import { blackBallURL, backBoardURL, whiteBallURL, emptyMarkedURL, blackBallYellowURL,
             whiteBallYellowURL, whiteBallMarkedURL, blackBallMarkedURL } from "../../assets";
 import { Stage, Layer, Image } from 'react-konva'
@@ -61,7 +60,7 @@ const BoardGame = props => {
     const [whiteBallMarkedImage] = useImage(whiteBallMarkedURL)
     const [blackBallMarkedImage] = useImage(blackBallMarkedURL)
     
-    const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+    const { enqueueSnackbar } = useSnackbar();
 
     const [winnerAlreadyAnnounced, setWinnerAlreadyAnnounced] = useState(false)
 
@@ -144,7 +143,7 @@ const BoardGame = props => {
 
     useEffect(() => {
         if (!winnerAlreadyAnnounced) {
-            checkWinner(abalonGame.board)
+            checkWinner(abalonGame.board, againstAI)
                 .then(player => {
                     if ([Players.White, Players.Black].includes(player)) {
                         enqueueSnackbar(`Player ${player} wins! You may continue playing if you want :-)`, {
@@ -154,7 +153,7 @@ const BoardGame = props => {
                     }
                 })
         }
-    }, [abalonGame.turn, winnerAlreadyAnnounced])
+    }, [abalonGame.turn, againstAI, winnerAlreadyAnnounced])
 
     useEffect(() => {
         if (abalonGameState.isAITurn) {
